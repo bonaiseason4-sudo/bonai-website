@@ -6,7 +6,7 @@ const art = ['✦', '☘', '☾', '❋', '✧']
 export function PlaylistCard({ playlist, index }: { playlist: Playlist; index: number }) {
   return (
     <Link to={`/playlist/${playlist.id}`} className="playlist-card">
-      <div className={`playlist-art playlist-art--${(index % 4) + 1}`}>
+      <div className={`playlist-art playlist-art--${(index % 4) + 1}${playlist.image_url ? ' playlist-art--with-image' : ''}`}>
         {playlist.image_url ? <img src={playlist.image_url} alt="" loading="lazy" /> : <span aria-hidden="true">{art[index % art.length]}</span>}
       </div>
       <div className="playlist-card__body">

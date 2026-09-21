@@ -73,6 +73,7 @@ main { flex: 1; }
 .playlist-card:hover { transform: translateY(-7px); box-shadow: var(--shadow); border-color: #dbcda9; }
 .playlist-art { height: 190px; display: grid; place-items: center; overflow: hidden; position: relative; }
 .playlist-art::after { content: ''; position: absolute; width: 110px; height: 110px; border: 2px dashed rgba(255,255,255,.55); border-radius: 50%; }
+.playlist-art--with-image::after { display: none; }
 .playlist-art span { font-size: 4.4rem; color: rgba(255,255,255,.92); line-height: 1; z-index: 1; }
 .playlist-art img { width: 100%; height: 100%; object-fit: cover; }
 .playlist-art--1 { background: linear-gradient(145deg, #3d826e, #17594b); }
