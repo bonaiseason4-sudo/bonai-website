@@ -33,10 +33,12 @@ main { flex: 1; }
 .header-inner { height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand-link { display: inline-flex; }
 .brand-mark { display: flex; align-items: center; gap: 11px; }
-.brand-mark img { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; box-shadow: 0 5px 18px rgba(56,44,20,.12); }
+.brand-mark__bunai-logo { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; box-shadow: 0 5px 18px rgba(56,44,20,.12); }
 .brand-mark strong { display: block; font-size: 1.25rem; line-height: 1.2; color: var(--green); }
 .brand-mark span { display: block; margin-top: 2px; font-size: .73rem; color: var(--muted); }
-.brand-mark--compact img { width: 45px; height: 45px; }
+.brand-mark__divider { width: 1px; height: 37px; margin-inline: 4px 1px; background: var(--line); }
+.brand-mark__partner-logo { width: 70px; height: 54px; padding: 2px; object-fit: contain; border-radius: 8px; mix-blend-mode: multiply; }
+.brand-mark--compact .brand-mark__bunai-logo { width: 45px; height: 45px; }
 .site-header nav { display: flex; gap: 10px; align-items: center; }
 .site-header nav a { padding: 10px 14px; border-radius: 999px; font-weight: 600; color: #49665e; transition: .2s ease; }
 .site-header nav a:hover, .site-header nav a.active { background: #fff; color: var(--green); box-shadow: 0 4px 18px rgba(61,51,27,.07); }
@@ -167,7 +169,7 @@ main { flex: 1; }
 @media (max-width: 680px) {
   .shell { width: min(100% - 24px, 1160px); }
   .header-inner { height: 72px; }
-  .brand-mark img { width: 46px; height: 46px; }
+  .brand-mark__bunai-logo { width: 46px; height: 46px; }
   .brand-mark div { display: none; }
   .site-header nav a { padding: 8px 10px; font-size: .82rem; }
   .hero, .hero-grid { min-height: auto; }
