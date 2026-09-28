@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="shell footer-inner">
         <BrandMark compact />
-        <div className="footer-partner"><span>بالتعاون مع</span><img src={tarteelLogo} alt="جمعية الترتيل للخدمات الثقافية والدينية" /></div>
+        <div className="footer-partner"><img src={tarteelLogo} alt="جمعية الترتيل للخدمات الثقافية والدينية" /></div>
         <p>بنيّ — مساحة تعليمية هادئة وآمنة لتنمية المعرفة والإيمان.</p>
         <small>صُنِع بعناية للصغار وأسرهم.</small>
       </div>

@@ -26,7 +26,6 @@ export function HomePage() {
 
       <section className="association-section" aria-label="الجهة الشريكة">
         <div className="shell association-section__inner">
-          <span>بالتعاون مع</span>
           <img src={tarteelLogo} alt="جمعية الترتيل للخدمات الثقافية والدينية" />
         </div>
       </section>

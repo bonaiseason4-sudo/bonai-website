@@ -10,12 +10,12 @@ export function VideoPlayer({ video }: { video: Video }) {
   }
 
   if (embed.kind === 'native') {
-    return <div className="video-frame"><video title={video.title} controls preload="metadata" playsInline>{embed.urls.map((url) => <source key={url} src={url} type={url.endsWith('.m4v') || url.endsWith('.mp4') ? 'video/mp4' : undefined} />)}</video></div>
+    return <div className="video-frame"><video key={video.id} title={video.title} controls preload="metadata" playsInline>{embed.urls.map((url) => <source key={url} src={url} type={url.endsWith('.m4v') || url.endsWith('.mp4') ? 'video/mp4' : undefined} />)}</video></div>
   }
 
   return (
     <div className="video-frame">
-      <iframe src={embed.url} title={video.title} allow="autoplay; encrypted-media" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
+      <iframe key={video.id} src={embed.url} title={video.title} allow="autoplay; encrypted-media" allowFullScreen loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
     </div>
   )
 }

@@ -5,7 +5,7 @@ const attachmentMeta: Record<AttachmentType, { icon: string; label: string; clas
   POWERPOINT: { icon: 'PPT', label: 'عرض تقديمي', className: 'attachment-card--powerpoint' },
   WORD: { icon: 'DOC', label: 'مستند Word', className: 'attachment-card--word' },
   SPREADSHEET: { icon: 'XLS', label: 'جدول بيانات', className: 'attachment-card--spreadsheet' },
-  GOOGLE_FORM: { icon: '✓', label: 'اختبر فهمك', className: 'attachment-card--form' },
+  GOOGLE_FORM: { icon: '?', label: 'اختبر فهمك', className: 'attachment-card--form' },
   GEMINI_QUIZ: { icon: '✦', label: 'تحدّي ذكي', className: 'attachment-card--quiz' },
   LINK: { icon: '↗', label: 'رابط مفيد', className: 'attachment-card--link' },
   OTHER: { icon: '✦', label: 'مرفق', className: 'attachment-card--other' },

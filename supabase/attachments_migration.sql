@@ -1,8 +1,8 @@
 -- Run once in Supabase SQL Editor for the existing database.
 
 create table if not exists public.attachments (
-  id uuid primary key default gen_random_uuid(),
-  video_id uuid not null references public.videos(id) on delete cascade,
+  id text primary key,
+  video_id text not null references public.videos(id) on update cascade on delete cascade,
   title text not null check (char_length(trim(title)) between 1 and 160),
   description text,
   url text not null check (char_length(trim(url)) >= 10),

@@ -1,10 +1,8 @@
 -- Bunay database schema for Supabase PostgreSQL
 -- Run this entire file once in Supabase > SQL Editor.
 
-create extension if not exists pgcrypto;
-
 create table if not exists public.playlists (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key,
   title text not null check (char_length(trim(title)) between 1 and 120),
   description text,
   image_url text,
@@ -14,8 +12,8 @@ create table if not exists public.playlists (
 );
 
 create table if not exists public.videos (
-  id uuid primary key default gen_random_uuid(),
-  playlist_id uuid not null references public.playlists(id) on delete cascade,
+  id text primary key,
+  playlist_id text not null references public.playlists(id) on update cascade on delete cascade,
   title text not null check (char_length(trim(title)) between 1 and 160),
   description text,
   drive_file_id text,
@@ -34,8 +32,8 @@ create index if not exists idx_playlists_active_sort on public.playlists (is_act
 create index if not exists idx_videos_playlist_active_sort on public.videos (playlist_id, is_active, sort_order, created_at);
 
 create table if not exists public.attachments (
-  id uuid primary key default gen_random_uuid(),
-  video_id uuid not null references public.videos(id) on delete cascade,
+  id text primary key,
+  video_id text not null references public.videos(id) on update cascade on delete cascade,
   title text not null check (char_length(trim(title)) between 1 and 160),
   description text,
   url text not null check (char_length(trim(url)) >= 10),

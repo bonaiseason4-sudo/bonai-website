@@ -5,13 +5,14 @@ with removed_playlist as (
   delete from public.playlists where title = 'السيرة النبوية - المرحلة المكية'
 ),
 new_playlist as (
-  insert into public.playlists (title, description, sort_order, is_active)
-  values ('السيرة النبوية - المرحلة المكية', 'حلقات السيرة النبوية في المرحلة المكية.', 3, true)
+  insert into public.playlists (id, title, description, sort_order, is_active)
+  values ('AL_SEERAH_MAKKIYYAH', 'السيرة النبوية - المرحلة المكية', 'حلقات السيرة النبوية في المرحلة المكية.', 3, true)
   returning id
 ),
 new_videos as (
-  insert into public.videos (playlist_id, title, video_url, video_source, sort_order, is_active)
-  select new_playlist.id,
+  insert into public.videos (id, playlist_id, title, video_url, video_source, sort_order, is_active)
+  select 'AL_SEERAH_MAKKIYYAH_' || episode_number,
+    new_playlist.id,
     'الحلقة ' || case episode_number
       when 1 then 'الأولى' when 2 then 'الثانية' when 3 then 'الثالثة' when 4 then 'الرابعة'
       when 5 then 'الخامسة' when 6 then 'السادسة' when 7 then 'السابعة' when 8 then 'الثامنة'
@@ -31,8 +32,8 @@ new_videos as (
   ) as source(episode_number, video_url)
   returning id, sort_order
 )
-insert into public.attachments (video_id, title, url, file_type, sort_order, is_active)
-select new_videos.id,
+insert into public.attachments (id, video_id, title, url, file_type, sort_order, is_active)
+select new_videos.id || '_ATTACHMENT', new_videos.id,
   'مرفق الحلقة ' || case new_videos.sort_order
     when 1 then 'الأولى' when 2 then 'الثانية' when 3 then 'الثالثة' when 4 then 'الرابعة'
     when 5 then 'الخامسة' when 6 then 'السادسة' when 7 then 'السابعة' when 8 then 'الثامنة'

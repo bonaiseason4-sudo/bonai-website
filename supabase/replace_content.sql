@@ -6,14 +6,15 @@ begin;
 delete from public.playlists;
 
 with inserted_playlists as (
-  insert into public.playlists (title, description, sort_order, is_active)
+  insert into public.playlists (id, title, description, sort_order, is_active)
   values
-    ('السيرة النبوية - المرحلة المدنية', null, 1, true),
-    ('سعادة المؤمن', null, 2, true)
+    ('AL_SEERAH_MADANIYYAH', 'السيرة النبوية - المرحلة المدنية', null, 1, true),
+    ('SAADAT_AL_MUMIN', 'سعادة المؤمن', null, 2, true)
   returning id, title
 )
-insert into public.videos (playlist_id, title, drive_file_id, video_url, video_source, sort_order, is_active)
+insert into public.videos (id, playlist_id, title, drive_file_id, video_url, video_source, sort_order, is_active)
 select
+  case when title = 'السيرة النبوية - المرحلة المدنية' then 'AL_SEERAH_MADANIYYAH_01' else 'SAADAT_AL_MUMIN_01' end,
   id,
   title,
   case when title = 'السيرة النبوية - المرحلة المدنية' then '1f16HK7XEe-pBccw1rTc3r8TRG0VXydkB' end,
