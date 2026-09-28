@@ -34,7 +34,7 @@ export function PlaylistPage() {
             {selectedVideo && <div className="current-video-copy"><span>الدرس {videos.findIndex((v) => v.id === selectedVideo.id) + 1} من {videos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
             <AttachmentList attachments={attachments ?? []} />
           </div>
-          <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{videos.length} درس</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
+          <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{videos.length} {videos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
         </div>
       </div>
     </section>
