@@ -4,6 +4,7 @@ import { StatePanel } from '../components/StatePanel'
 import { useAsync } from '../hooks/useAsync'
 import { getPlaylists, usingDemoData } from '../services/contentService'
 import logo from '../assets/bunay-logo.png'
+import tarteelLogo from '../assets/jamiyat-altarteel-logo.jpg'
 
 export function HomePage() {
   const { data: playlists, loading, error } = useAsync(getPlaylists, [])
@@ -20,6 +21,13 @@ export function HomePage() {
             <div className="hero-actions"><a className="primary-button" href="#playlists">ابدأ التعلّم</a><span className="gentle-note">محتوى مرتب في سلاسل سهلة المتابعة</span></div>
           </div>
           <div className="hero-visual" aria-hidden="true"><div className="sun-dot" /><div className="logo-stage"><img src={logo} alt="" /></div><span className="float-card float-card--1">السيرة</span><span className="float-card float-card--2">العقيدة</span><span className="float-card float-card--3">الآداب</span></div>
+        </div>
+      </section>
+
+      <section className="association-section" aria-label="الجهة الشريكة">
+        <div className="shell association-section__inner">
+          <span>بالتعاون مع</span>
+          <img src={tarteelLogo} alt="جمعية الترتيل للخدمات الثقافية والدينية" />
         </div>
       </section>
 
