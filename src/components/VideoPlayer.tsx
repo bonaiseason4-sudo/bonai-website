@@ -10,7 +10,7 @@ export function VideoPlayer({ video }: { video: Video }) {
   }
 
   if (embed.kind === 'native') {
-    return <div className="video-frame"><video src={embed.url} title={video.title} controls preload="metadata" /></div>
+    return <div className="video-frame"><video title={video.title} controls preload="metadata" playsInline>{embed.urls.map((url) => <source key={url} src={url} type={url.endsWith('.m4v') || url.endsWith('.mp4') ? 'video/mp4' : undefined} />)}</video></div>
   }
 
   return (
