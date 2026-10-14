@@ -148,7 +148,7 @@ main { flex: 1; }
 .quiz-stage__eyebrow { padding: 7px 13px; border-radius: 999px; background: #e8d9f5; color: #56317e; font-size: .78rem; font-weight: 800; }
 .quiz-stage h2 { margin: 2px 0 0; color: #4a286e; font-size: clamp(1.7rem, 4vw, 2.35rem); }
 .quiz-stage > p { max-width: 500px; margin: 0 0 14px; color: #71627e; line-height: 1.9; }
-.quiz-stage .quiz-only { width: min(100%, 580px); margin-top: 0; margin-inline: auto; justify-self: center; }
+.quiz-stage .quiz-only { width: 92%; max-width: none; margin-top: 0; margin-inline: auto; justify-self: center; }
 .quiz-stage .attachment-grid--quiz .attachment-card { width: 100%; }
 .attachments__heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; color: var(--green); font-weight: 800; }
 .attachments__heading small { color: var(--muted); font-size: .75rem; font-weight: 600; }
