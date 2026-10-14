@@ -32,7 +32,7 @@ export function PlaylistPage() {
           <div className="watch-main">
             {selectedVideo && !selectedVideo.isQuiz && <VideoPlayer video={selectedVideo} />}
             {selectedVideo && !selectedVideo.isQuiz && <div className="current-video-copy"><span>الدرس {videos.findIndex((v) => v.id === selectedVideo.id) + 1} من {videos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
-            <AttachmentList attachments={attachments ?? []} />
+            <AttachmentList attachments={attachments ?? []} quizOnly={selectedVideo?.isQuiz === true} />
           </div>
           <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{videos.length} {videos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
         </div>
