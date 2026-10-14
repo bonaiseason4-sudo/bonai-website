@@ -34,7 +34,7 @@ export function PlaylistPage() {
           <div className="watch-main">
             {selectedVideo && !selectedIsQuiz && <VideoPlayer video={selectedVideo} />}
             {selectedVideo && !selectedIsQuiz && <div className="current-video-copy"><span>الدرس {lessonVideos.findIndex((v) => v.id === selectedVideo.id) + 1} من {lessonVideos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
-            {selectedVideo && selectedIsQuiz ? <section className="quiz-stage"><span className="quiz-stage__eyebrow">اختبار تفاعلي</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'اختبر فهمك في هذا الدرس، ثم عد إلى السلسلة متى شئت.'}</p><AttachmentList attachments={attachments ?? []} quizOnly /></section> : <AttachmentList attachments={attachments ?? []} />}
+            {selectedVideo && selectedIsQuiz ? <section className="quiz-stage"><span className="quiz-stage__eyebrow">اختبار تفاعلي</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'اختبر ما تعلمته في هذه السلسلة، وارجع إلى الدروس متى احتجت إلى مراجعة أي جزء.'}</p><AttachmentList attachments={attachments ?? []} quizOnly /></section> : <AttachmentList attachments={attachments ?? []} />}
           </div>
           <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{lessonVideos.length} {lessonVideos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
         </div>
