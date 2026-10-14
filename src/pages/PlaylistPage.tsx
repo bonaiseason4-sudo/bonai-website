@@ -17,6 +17,7 @@ export function PlaylistPage() {
   useEffect(() => { if (videos?.length && !videos.some((v) => v.id === selectedId)) setSelectedId(videos[0].id) }, [videos, selectedId])
   const selectedVideo = useMemo(() => videos?.find((video) => video.id === selectedId) ?? videos?.[0] ?? null, [videos, selectedId])
   const lessonVideos = useMemo(() => videos?.filter((video) => !video.isQuiz) ?? [], [videos])
+  const selectedIsQuiz = selectedVideo?.isQuiz === true || selectedVideo?.isQuiz === 1
   const { data: attachments } = useAsync(() => getVideoAttachments(selectedVideo?.id ?? ''), [selectedVideo?.id])
 
   if (playlistLoading || videosLoading) return <section className="section shell"><div className="playlist-page-skeleton"><div className="skeleton skeleton-line wide" /><div className="skeleton skeleton-video" /><div className="skeleton skeleton-line" /></div></section>
@@ -29,11 +30,11 @@ export function PlaylistPage() {
       <div className="shell">
         <div className="breadcrumb"><Link to="/">الرئيسية</Link><span>/</span><span>{playlist.title}</span></div>
         <header className="playlist-heading"><span className="eyebrow">سلسلة تعليمية</span><h1>{playlist.title}</h1><p>{playlist.description}</p></header>
-        <div className="watch-layout">
+        <div className={`watch-layout ${selectedIsQuiz ? 'watch-layout--quiz' : ''}`}>
           <div className="watch-main">
-            {selectedVideo && !selectedVideo.isQuiz && <VideoPlayer video={selectedVideo} />}
-            {selectedVideo && !selectedVideo.isQuiz && <div className="current-video-copy"><span>الدرس {lessonVideos.findIndex((v) => v.id === selectedVideo.id) + 1} من {lessonVideos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
-            <AttachmentList attachments={attachments ?? []} quizOnly={selectedVideo?.isQuiz === true} />
+            {selectedVideo && !selectedIsQuiz && <VideoPlayer video={selectedVideo} />}
+            {selectedVideo && !selectedIsQuiz && <div className="current-video-copy"><span>الدرس {lessonVideos.findIndex((v) => v.id === selectedVideo.id) + 1} من {lessonVideos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
+            {selectedVideo && selectedIsQuiz ? <section className="quiz-stage"><span className="quiz-stage__eyebrow">اختبار تفاعلي</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'اختبر فهمك في هذا الدرس، ثم عد إلى السلسلة متى شئت.'}</p><AttachmentList attachments={attachments ?? []} quizOnly /></section> : <AttachmentList attachments={attachments ?? []} />}
           </div>
           <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{lessonVideos.length} {lessonVideos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
         </div>
