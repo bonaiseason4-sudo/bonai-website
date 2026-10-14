@@ -14,7 +14,7 @@ const attachmentMeta: Record<AttachmentType, { icon: string; label: string; clas
 export function AttachmentList({ attachments, quizOnly = false }: { attachments: Attachment[]; quizOnly?: boolean }) {
   if (!attachments.length) return null
 
-  const cards = <div className="attachment-grid">
+  const cards = <div className={`attachment-grid ${quizOnly ? 'attachment-grid--quiz' : ''}`}>
     {attachments.map((attachment) => {
       const meta = attachmentMeta[attachment.file_type] ?? attachmentMeta.OTHER
       return <a key={attachment.id} className={`attachment-card ${meta.className}`} href={attachment.url} target="_blank" rel="noreferrer"><span className="attachment-icon" aria-hidden="true">{meta.icon}</span><span className="attachment-copy"><strong>{attachment.title}</strong><small>{attachment.description || meta.label}</small></span><span className="attachment-open" aria-hidden="true">↗</span></a>
