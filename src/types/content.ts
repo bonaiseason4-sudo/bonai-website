@@ -19,6 +19,7 @@ export interface Video {
   video_source: 'GOOGLE_DRIVE' | 'DIRECT'
   sort_order: number
   is_active: boolean
+  isQuiz?: boolean
   created_at: string
 }
 

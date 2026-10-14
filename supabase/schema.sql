@@ -25,6 +25,7 @@ create table if not exists public.videos (
   ),
   sort_order integer not null default 0 check (sort_order >= 0),
   is_active boolean not null default true,
+  "isQuiz" boolean not null default false,
   created_at timestamptz not null default now()
 );
 
