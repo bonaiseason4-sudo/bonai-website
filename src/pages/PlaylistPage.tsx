@@ -16,6 +16,7 @@ export function PlaylistPage() {
 
   useEffect(() => { if (videos?.length && !videos.some((v) => v.id === selectedId)) setSelectedId(videos[0].id) }, [videos, selectedId])
   const selectedVideo = useMemo(() => videos?.find((video) => video.id === selectedId) ?? videos?.[0] ?? null, [videos, selectedId])
+  const lessonVideos = useMemo(() => videos?.filter((video) => !video.isQuiz) ?? [], [videos])
   const { data: attachments } = useAsync(() => getVideoAttachments(selectedVideo?.id ?? ''), [selectedVideo?.id])
 
   if (playlistLoading || videosLoading) return <section className="section shell"><div className="playlist-page-skeleton"><div className="skeleton skeleton-line wide" /><div className="skeleton skeleton-video" /><div className="skeleton skeleton-line" /></div></section>
@@ -31,10 +32,10 @@ export function PlaylistPage() {
         <div className="watch-layout">
           <div className="watch-main">
             {selectedVideo && !selectedVideo.isQuiz && <VideoPlayer video={selectedVideo} />}
-            {selectedVideo && !selectedVideo.isQuiz && <div className="current-video-copy"><span>الدرس {videos.findIndex((v) => v.id === selectedVideo.id) + 1} من {videos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
+            {selectedVideo && !selectedVideo.isQuiz && <div className="current-video-copy"><span>الدرس {lessonVideos.findIndex((v) => v.id === selectedVideo.id) + 1} من {lessonVideos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
             <AttachmentList attachments={attachments ?? []} quizOnly={selectedVideo?.isQuiz === true} />
           </div>
-          <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{videos.length} {videos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
+          <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{lessonVideos.length} {lessonVideos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} /></aside>
         </div>
       </div>
     </section>

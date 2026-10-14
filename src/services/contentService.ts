@@ -8,20 +8,22 @@ export async function getPlaylists(): Promise<Playlist[]> {
   if (!supabase) {
     return demoPlaylists.map((playlist) => ({
       ...playlist,
-      video_count: demoVideos.filter((video) => video.playlist_id === playlist.id && video.is_active).length,
+      video_count: demoVideos.filter((video) => video.playlist_id === playlist.id && video.is_active && !video.isQuiz).length,
     }))
   }
 
   const [{ data: playlists, error: playlistError }, { data: videos, error: videoError }] = await Promise.all([
     supabase.from('playlists').select('*').eq('is_active', true).order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
-    supabase.from('videos').select('playlist_id').eq('is_active', true),
+    supabase.from('videos').select('playlist_id,isQuiz').eq('is_active', true),
   ])
 
   if (playlistError) throw playlistError
   if (videoError) throw videoError
 
   const counts = new Map<string, number>()
-  for (const video of videos ?? []) counts.set(video.playlist_id, (counts.get(video.playlist_id) ?? 0) + 1)
+  for (const video of videos ?? []) {
+    if (!video.isQuiz) counts.set(video.playlist_id, (counts.get(video.playlist_id) ?? 0) + 1)
+  }
 
   return (playlists ?? []).map((playlist) => ({ ...playlist, video_count: counts.get(playlist.id) ?? 0 })) as Playlist[]
 }
