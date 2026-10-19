@@ -16,8 +16,8 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const isRegister = mode === 'register'
-  // Where to go after logging in: the page that sent the user here, or the profile.
-  const from = (location.state as { from?: string } | null)?.from ?? '/profile'
+  // Where to go after logging in: the page that sent the user here (e.g. the profile), otherwise home.
+  const from = (location.state as { from?: string } | null)?.from ?? '/'
 
   if (!available) {
     return <section className="section shell"><StatePanel icon="!" title="الحسابات غير متاحة الآن"><p>الموقع يعمل ببيانات تجريبية، لذلك لا يمكن إنشاء حساب أو تسجيل الدخول.</p></StatePanel></section>
