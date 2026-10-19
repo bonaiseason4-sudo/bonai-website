@@ -9,7 +9,7 @@ export const app = express()
 app.disable('x-powered-by')
 app.use(cors({
   origin: allowedOrigins.includes('*') ? '*' : allowedOrigins,
-  methods: ['GET', 'POST', 'PATCH', 'PUT'],
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   maxAge: 86400,
 }))

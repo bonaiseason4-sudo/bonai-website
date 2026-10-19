@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { displayName, nameError, nameHint } from '../lib/userFields'
 import { authErrorMessage, changePassword, updateProfile } from '../services/authService'
 import type { User } from '../types/auth'
 
@@ -17,17 +18,21 @@ export function ProfilePage() {
 function ProfileCard({ user }: { user: User }) {
   const { logout, setUser } = useAuth()
   const navigate = useNavigate()
+  const [name, setName] = useState(user.name ?? '')
   const [phone, setPhone] = useState(user.phone ?? '')
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [saving, setSaving] = useState(false)
 
   async function handleSave(event: FormEvent) {
     event.preventDefault()
-    setSaving(true)
     setMessage(null)
+    const invalid = nameError(name)
+    if (invalid) return setMessage({ type: 'error', text: invalid })
+    setSaving(true)
     try {
-      const updated = await updateProfile({ phone })
+      const updated = await updateProfile({ name, phone })
       setUser(updated)
+      setName(updated.name ?? '')
       setPhone(updated.phone ?? '')
       setMessage({ type: 'success', text: 'تم حفظ التعديلات.' })
     } catch (error) {
@@ -49,9 +54,10 @@ function ProfileCard({ user }: { user: User }) {
     <section className="section shell auth-page">
       <div className="auth-card profile-card">
         <div className="profile-card__header">
-          <div className="profile-avatar" aria-hidden="true">{user.username.charAt(0).toUpperCase()}</div>
+          <div className="profile-avatar" aria-hidden="true">{displayName(user).charAt(0).toUpperCase()}</div>
           <div>
-            <h1>{user.username}</h1>
+            <h1>{displayName(user)}</h1>
+            <p className="profile-username" dir="ltr">@{user.username}</p>
             <p><span className={`role-badge role-badge--${user.role}`}>{roleLabels[user.role]}</span> · انضم في {joined}</p>
           </div>
         </div>
@@ -61,14 +67,21 @@ function ProfileCard({ user }: { user: User }) {
           <p>تسجيل الحضور في الدروس، سلسلة الأيام المتتالية، وأسئلة يومية.</p>
         </div>
 
+        {!user.name && <p className="admin-notice">أضف اسمك بالعربية ليظهر بدلًا من اسم المستخدم.</p>}
+
         <form onSubmit={handleSave}>
+          <label className="field">
+            <span>الاسم</span>
+            <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required maxLength={50} />
+            <small className="field__hint">{nameHint}</small>
+          </label>
           <label className="field">
             <span>رقم الهاتف <small>(اختياري)</small></span>
             <input type="tel" dir="ltr" value={phone} onChange={(event) => setPhone(event.target.value)} autoComplete="tel" maxLength={30} />
           </label>
           {message && <p className={message.type === 'error' ? 'form-error' : 'form-success'} role="status">{message.text}</p>}
           <div className="profile-actions">
-            <button className="primary-button" type="submit" disabled={saving || phone === (user.phone ?? '')}>{saving ? 'جارٍ الحفظ...' : 'حفظ'}</button>
+            <button className="primary-button" type="submit" disabled={saving || (name === (user.name ?? '') && phone === (user.phone ?? ''))}>{saving ? 'جارٍ الحفظ...' : 'حفظ'}</button>
           </div>
         </form>
 

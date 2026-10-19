@@ -1,11 +1,9 @@
 import type { Request, Response } from 'express'
 import { hashPassword, verifyPassword } from '../lib/crypto'
+import { arabicName, phone as readPhone, username as readUsername } from '../lib/validate'
 import { SessionModel } from '../models/session.model'
 import { UserModel, UsernameTakenError, type UserRow } from '../models/user.model'
 import { userView } from '../views/user.view'
-
-const MAX_USERNAME_LENGTH = 50
-const MAX_PHONE_LENGTH = 30
 
 function readString(value: unknown): string {
   return typeof value === 'string' ? value : ''
@@ -13,20 +11,17 @@ function readString(value: unknown): string {
 
 export const AuthController = {
   async register(req: Request, res: Response) {
-    const username = readString(req.body?.username).trim()
+    const username = readUsername(req.body?.username)
+    const name = arabicName(req.body?.name)
     const password = readString(req.body?.password)
-    const phone = readString(req.body?.phone).trim() || null
-
-    if (!username) return void res.status(400).json({ error: 'Username is required' })
-    if (username.length > MAX_USERNAME_LENGTH) return void res.status(400).json({ error: `Username must be at most ${MAX_USERNAME_LENGTH} characters` })
-    if (!password) return void res.status(400).json({ error: 'Password is required' })
-    if (phone && phone.length > MAX_PHONE_LENGTH) return void res.status(400).json({ error: `Phone must be at most ${MAX_PHONE_LENGTH} characters` })
+    const phone = readPhone(req.body?.phone)
+    if (!password) return void res.status(400).json({ error: 'Password is required', code: 'MISSING_PASSWORD' })
 
     let user: UserRow
     try {
-      user = await UserModel.create({ username, phone, passwordHash: await hashPassword(password) })
+      user = await UserModel.create({ username, name, phone, passwordHash: await hashPassword(password) })
     } catch (error) {
-      if (error instanceof UsernameTakenError) return void res.status(409).json({ error: 'Username is already taken' })
+      if (error instanceof UsernameTakenError) return void res.status(409).json({ error: 'Username is already taken', code: 'USERNAME_TAKEN' })
       throw error
     }
 

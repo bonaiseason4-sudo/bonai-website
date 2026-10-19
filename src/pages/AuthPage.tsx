@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { StatePanel } from '../components/StatePanel'
 import { useAuth } from '../hooks/useAuth'
+import { nameError, nameHint, usernameError, usernameHint } from '../lib/userFields'
 import { authErrorMessage } from '../services/authService'
 
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
@@ -9,6 +10,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [username, setUsername] = useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -25,9 +27,11 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+    const invalid = isRegister ? nameError(name) ?? usernameError(username) : null
+    if (invalid) return setError(invalid)
     setSubmitting(true)
     try {
-      if (isRegister) await register(username, password, phone)
+      if (isRegister) await register({ username, name, password, phone })
       else await login(username, password)
       navigate(from, { replace: true })
     } catch (submitError) {
@@ -43,9 +47,18 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
         <h1>{isRegister ? 'إنشاء حساب' : 'تسجيل الدخول'}</h1>
         <p className="auth-card__lead">{isRegister ? 'أنشئ حسابك لتتابع حضورك وإنجازاتك في الدروس.' : 'ادخل إلى حسابك لتكمل رحلتك.'}</p>
 
+        {isRegister && (
+          <label className="field">
+            <span>الاسم</span>
+            <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required maxLength={50} autoFocus />
+            <small className="field__hint">{nameHint}</small>
+          </label>
+        )}
+
         <label className="field">
           <span>اسم المستخدم</span>
-          <input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" required maxLength={50} autoFocus />
+          <input dir="ltr" value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" autoCapitalize="none" spellCheck={false} required maxLength={50} autoFocus={!isRegister} />
+          {isRegister && <small className="field__hint">{usernameHint}</small>}
         </label>
 
         <label className="field">

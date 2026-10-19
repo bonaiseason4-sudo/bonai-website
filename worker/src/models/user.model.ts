@@ -5,6 +5,7 @@ export type UserRole = 'user' | 'admin'
 export interface UserRow {
   id: string
   username: string
+  name: string | null
   phone: string | null
   password_hash: string
   role: UserRole
@@ -18,12 +19,12 @@ export const UserModel = {
     return db.prepare('SELECT * FROM users WHERE username = ?').bind(username).first<UserRow>()
   },
 
-  async create(data: { username: string; phone: string | null; passwordHash: string }): Promise<UserRow> {
+  async create(data: { username: string; name: string; phone: string | null; passwordHash: string }): Promise<UserRow> {
     const id = crypto.randomUUID()
     try {
       const user = await db
-        .prepare('INSERT INTO users (id, username, phone, password_hash) VALUES (?, ?, ?, ?) RETURNING *')
-        .bind(id, data.username, data.phone, data.passwordHash)
+        .prepare('INSERT INTO users (id, username, name, phone, password_hash) VALUES (?, ?, ?, ?, ?) RETURNING *')
+        .bind(id, data.username, data.name, data.phone, data.passwordHash)
         .first<UserRow>()
       return user!
     } catch (error) {
@@ -36,8 +37,8 @@ export const UserModel = {
     await db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(passwordHash, id).run()
   },
 
-  async updateProfile(id: string, data: { phone: string | null }): Promise<UserRow> {
-    const user = await db.prepare('UPDATE users SET phone = ? WHERE id = ? RETURNING *').bind(data.phone, id).first<UserRow>()
+  async updateProfile(id: string, data: { name: string; phone: string | null }): Promise<UserRow> {
+    const user = await db.prepare('UPDATE users SET name = ?, phone = ? WHERE id = ? RETURNING *').bind(data.name, data.phone, id).first<UserRow>()
     return user!
   },
 }

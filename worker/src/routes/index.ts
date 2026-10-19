@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { cacheFor, noStore } from '../middleware/cache'
+import { adminRoutes } from './admin.routes'
 import { authRoutes } from './auth.routes'
 import { playlistRoutes } from './playlist.routes'
 import { profileRoutes } from './profile.routes'
@@ -14,3 +15,4 @@ apiRoutes.use('/videos', cacheFor(60), videoRoutes)
 // Account responses are per user and must never be cached.
 apiRoutes.use('/auth', noStore, authRoutes)
 apiRoutes.use('/profile', noStore, profileRoutes)
+apiRoutes.use('/admin', noStore, adminRoutes)

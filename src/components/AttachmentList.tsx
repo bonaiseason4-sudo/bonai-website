@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { Attachment, AttachmentType } from '../types/content'
 
 const attachmentMeta: Record<AttachmentType, { icon: string; label: string; className: string }> = {
@@ -11,14 +12,29 @@ const attachmentMeta: Record<AttachmentType, { icon: string; label: string; clas
   OTHER: { icon: '✦', label: 'مرفق', className: 'attachment-card--other' },
 }
 
-export function AttachmentList({ attachments, quizOnly = false }: { attachments: Attachment[]; quizOnly?: boolean }) {
-  if (!attachments.length) return null
+interface AttachmentListProps {
+  attachments: Attachment[]
+  quizOnly?: boolean
+  // Admin only: the ⋮ menu for each attachment, and the add tile after the cards.
+  renderMenu?: (attachment: Attachment) => ReactNode
+  footer?: ReactNode
+}
+
+export function AttachmentList({ attachments, quizOnly = false, renderMenu, footer }: AttachmentListProps) {
+  if (!attachments.length && !footer) return null
 
   const cards = <div className={`attachment-grid ${quizOnly ? 'attachment-grid--quiz' : ''}`}>
     {attachments.map((attachment) => {
       const meta = attachmentMeta[attachment.file_type] ?? attachmentMeta.OTHER
-      return <a key={attachment.id} className={`attachment-card ${meta.className}`} href={attachment.url} target="_blank" rel="noreferrer"><span className="attachment-icon" aria-hidden="true">{meta.icon}</span><span className="attachment-copy"><strong>{attachment.title}</strong><small>{attachment.description || meta.label}</small></span><span className="attachment-open" aria-hidden="true">↗</span></a>
+      const menu = renderMenu?.(attachment)
+      return (
+        <div key={attachment.id} className={`attachment-wrap${menu ? ' attachment-wrap--admin' : ''}${attachment.is_active ? '' : ' is-hidden'}`}>
+          <a className={`attachment-card ${meta.className}`} href={attachment.url} target="_blank" rel="noreferrer"><span className="attachment-icon" aria-hidden="true">{meta.icon}</span><span className="attachment-copy"><strong>{attachment.title}</strong><small>{!attachment.is_active && <span className="hidden-badge">مخفي</span>}{attachment.description || meta.label}</small></span><span className="attachment-open" aria-hidden="true">↗</span></a>
+          {menu && <div className="attachment-wrap__menu">{menu}</div>}
+        </div>
+      )
     })}
+    {footer}
   </div>
 
   if (quizOnly) return <div className="quiz-only">{cards}</div>

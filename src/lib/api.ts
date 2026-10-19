@@ -3,7 +3,7 @@ export const apiUrl = import.meta.env.VITE_API_URL?.trim().replace(/\/+$/, '')
 const TOKEN_KEY = 'bunay.token'
 
 export class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(public status: number, message: string, public code?: string) {
     super(message)
   }
 }
@@ -39,7 +39,7 @@ export async function apiRequest<T>(path: string, options: { method?: string; bo
 
   if (!response.ok) {
     const data = await response.json().catch(() => null)
-    throw new ApiError(response.status, data?.error ?? `API request failed (${response.status})`)
+    throw new ApiError(response.status, data?.error ?? `API request failed (${response.status})`, data?.code)
   }
   return (response.status === 204 ? undefined : await response.json()) as T
 }

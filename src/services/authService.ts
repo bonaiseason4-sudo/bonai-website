@@ -6,7 +6,7 @@ interface SessionResponse {
   token: string
 }
 
-export async function register(data: { username: string; password: string; phone: string }): Promise<User> {
+export async function register(data: { username: string; name: string; password: string; phone: string }): Promise<User> {
   const { user, token } = await apiRequest<SessionResponse>('/api/auth/register', { method: 'POST', body: data })
   setToken(token)
   return user
@@ -40,7 +40,7 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
-export async function updateProfile(data: { phone: string }): Promise<User> {
+export async function updateProfile(data: { name: string; phone: string }): Promise<User> {
   const { profile } = await apiRequest<{ profile: User }>('/api/profile', { method: 'PATCH', body: data })
   return profile
 }
@@ -52,6 +52,8 @@ export async function changePassword(password: string): Promise<void> {
 // Arabic message for an error returned by the API.
 export function authErrorMessage(error: unknown): string {
   if (!(error instanceof ApiError)) return 'تعذّر الاتصال بالخادم. تأكد من الإنترنت وحاول مرة أخرى.'
+  if (error.code === 'INVALID_USERNAME') return 'اسم المستخدم يجب أن يكون بالإنجليزية فقط (حروف وأرقام و _ بدون مسافات).'
+  if (error.code === 'INVALID_NAME') return 'الاسم يجب أن يكون بالحروف العربية فقط.'
   if (error.status === 409) return 'اسم المستخدم مستخدم بالفعل، اختر اسمًا آخر.'
   if (error.status === 401) return 'اسم المستخدم أو كلمة المرور غير صحيحة.'
   if (error.status === 400) return 'تأكد من إدخال اسم المستخدم وكلمة المرور.'

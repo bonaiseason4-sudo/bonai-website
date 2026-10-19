@@ -35,16 +35,17 @@ GET /api/videos/:id/attachments     مرفقات الدرس
 ### الحسابات
 
 ```text
-POST  /api/auth/register   {username, password, phone?}  إنشاء حساب
+POST  /api/auth/register   {username, name, password, phone?}  إنشاء حساب
 POST  /api/auth/login      {username, password}          تسجيل الدخول
 GET   /api/auth/me                                       المستخدم الحالي
 POST  /api/auth/logout                                   تسجيل الخروج
 GET   /api/profile                                       الملف الشخصي
-PATCH /api/profile         {phone}                       تعديل رقم الهاتف
+PATCH /api/profile         {name, phone}                 تعديل الاسم ورقم الهاتف
 PUT   /api/profile/password {password}                  تغيير كلمة المرور (بدون القديمة، ويسجّل الخروج من الأجهزة الأخرى)
 ```
 
-- اسم المستخدم فريد (بدون تفرقة بين الحروف الكبيرة والصغيرة).
+- اسم المستخدم بالإنجليزية فقط (حروف وأرقام و `_`)، وهو فريد (بدون تفرقة بين الحروف الكبيرة والصغيرة) ويُستخدم لتسجيل الدخول.
+- الاسم بالعربية فقط وغير فريد، ويظهر في الموقع بدلًا من اسم المستخدم.
 - لا توجد شروط على كلمة المرور، وتُحفظ مشفّرة (PBKDF2-SHA256 مع salt) ولا تُحفظ أبدًا كنص.
 - رقم الهاتف اختياري، غير فريد، ولا يتم التحقق منه.
 - بعد تسجيل الدخول يحصل المتصفح على token يُرسل في `Authorization: Bearer <token>`، وصلاحيته 90 يومًا.
@@ -56,6 +57,26 @@ npx wrangler d1 execute bunay --remote --command "UPDATE users SET role = 'admin
 ```
 
 في الكود، استخدم `requireAuth` ثم `requireRole('admin')` لحماية أي endpoint خاص بالمشرفين.
+
+### لوحة المشرف داخل الموقع
+
+عند تسجيل الدخول بحساب مشرف تظهر أدوات الإدارة مباشرة في صفحات الموقع:
+
+- زر **⋮** بجانب كل سلسلة ودرس ومرفق ← **تعديل** أو **حذف** (الحذف باللون الأحمر ويطلب تأكيدًا).
+- مربع منقّط بعلامة **+** لإضافة سلسلة (في الرئيسية) أو درس (في قائمة الدروس) أو مرفق (تحت الدرس).
+- الـID يكتبه المشرف بنفسه (حروف إنجليزية وأرقام و `_` أو `-`). يمكن تغييره عند التعديل، والدروس والمرفقات التابعة تنتقل معه تلقائيًا.
+- حذف سلسلة يحذف كل دروسها ومرفقاتها، وحذف درس يحذف مرفقاته.
+- المحتوى المخفي (غير ظاهر للزوار) يظهر للمشرف فقط بشارة «مخفي».
+
+```text
+GET    /api/admin/playlists                  كل السلاسل (مع المخفية)
+GET    /api/admin/playlists/:id              سلسلة
+GET    /api/admin/playlists/:id/videos       دروس السلسلة (مع المخفية)
+GET    /api/admin/videos/:id/attachments     مرفقات الدرس (مع المخفية)
+POST   /api/admin/{playlists|videos|attachments}        إضافة
+PUT    /api/admin/{playlists|videos|attachments}/:id    تعديل
+DELETE /api/admin/{playlists|videos|attachments}/:id    حذف
+```
 
 ---
 
@@ -146,7 +167,7 @@ https://drive.google.com/file/d/{FILE_ID}/preview
 
 ## 4) إضافة وتعديل المحتوى
 
-يمكنك استخدام **Cloudflare Dashboard > Storage & Databases > D1 > bunay > Console**، أو من الطرفية:
+أسهل طريقة: سجّل الدخول بحساب مشرف واستخدم أدوات الإدارة داخل الموقع (انظر «لوحة المشرف» أعلاه). أو يمكنك استخدام **Cloudflare Dashboard > Storage & Databases > D1 > bunay > Console**، أو من الطرفية:
 
 ```bash
 cd worker
