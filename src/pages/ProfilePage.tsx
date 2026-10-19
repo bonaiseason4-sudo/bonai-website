@@ -58,7 +58,7 @@ function ProfileView({ user }: { user: User }) {
           <SettingRow icon={<PhoneIcon />} label="رقم الهاتف" value={user.phone ? <span dir="ltr">{user.phone}</span> : 'لم يُضف بعد'} open={open === 'phone'} onToggle={() => toggle('phone')}>
             <PhoneForm user={user} />
           </SettingRow>
-          <SettingRow icon={<LockIcon />} label="كلمة المرور" value="••••••" open={open === 'password'} onToggle={() => toggle('password')}>
+          <SettingRow icon={<LockIcon />} label="تغيير كلمة المرور" value="••••••" open={open === 'password'} onToggle={() => toggle('password')}>
             <PasswordForm />
           </SettingRow>
         </div>
