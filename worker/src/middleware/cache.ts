@@ -7,3 +7,8 @@ export function cacheFor(seconds: number) {
     next()
   }
 }
+
+export function noStore(_req: Request, res: Response, next: NextFunction) {
+  res.set('Cache-Control', 'no-store')
+  next()
+}

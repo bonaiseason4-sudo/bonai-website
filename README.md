@@ -30,7 +30,31 @@ GET /api/playlists/:id/videos       دروس السلسلة (تشمل الاخت
 GET /api/videos/:id/attachments     مرفقات الدرس
 ```
 
-الـAPI للقراءة فقط ويعرض المحتوى النشط فقط (`is_active = 1`).
+المحتوى يُعرض للجميع بدون تسجيل دخول، ويظهر المحتوى النشط فقط (`is_active = 1`).
+
+### الحسابات
+
+```text
+POST  /api/auth/register   {username, password, phone?}  إنشاء حساب
+POST  /api/auth/login      {username, password}          تسجيل الدخول
+GET   /api/auth/me                                       المستخدم الحالي
+POST  /api/auth/logout                                   تسجيل الخروج
+GET   /api/profile                                       الملف الشخصي
+PATCH /api/profile         {phone}                       تعديل رقم الهاتف
+```
+
+- اسم المستخدم فريد (بدون تفرقة بين الحروف الكبيرة والصغيرة).
+- لا توجد شروط على كلمة المرور، وتُحفظ مشفّرة (PBKDF2-SHA256 مع salt) ولا تُحفظ أبدًا كنص.
+- رقم الهاتف اختياري، غير فريد، ولا يتم التحقق منه.
+- بعد تسجيل الدخول يحصل المتصفح على token يُرسل في `Authorization: Bearer <token>`، وصلاحيته 90 يومًا.
+- كل حساب جديد يكون `role = 'user'`. لجعل مستخدم مشرفًا:
+
+```bash
+cd worker
+npx wrangler d1 execute bunay --remote --command "UPDATE users SET role = 'admin' WHERE username = 'USERNAME'"
+```
+
+في الكود، استخدم `requireAuth` ثم `requireRole('admin')` لحماية أي endpoint خاص بالمشرفين.
 
 ---
 
@@ -237,6 +261,9 @@ supabase/           SQL القديم (مرجع فقط)
 ```text
 /                 Home
 /playlist/:id     Playlist + player
+/login            تسجيل الدخول
+/register         إنشاء حساب
+/profile          الملف الشخصي (للمسجلين فقط)
 *                 404
 ```
 
