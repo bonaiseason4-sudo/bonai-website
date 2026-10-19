@@ -1,0 +1,5 @@
+id,title,description,image_url,sort_order,is_active,created_at
+AL_SEERAH_MADANIYYAH,السيرة النبوية - المرحلة المدنية,,https://edknqsvpzeheeytlrjmp.supabase.co/storage/v1/object/public/bonay/madina.png,2,true,2026-09-21 07:29:20.931518+00
+AL_SEERAH_MAKKIYYAH,السيرة النبوية - المرحلة المكية,حلقات السيرة النبوية في المرحلة المكية.,https://edknqsvpzeheeytlrjmp.supabase.co/storage/v1/object/public/bonay/makka.png,1,false,2026-09-21 11:52:29.856126+00
+MUTANAWWEAT,متنوع,,https://edknqsvpzeheeytlrjmp.supabase.co/storage/v1/object/public/bonay/miscellaneous.png,4,true,2026-09-28 06:26:43.188747+00
+SAADAT_AL_MOAMIN,سعادة المؤمن,,https://edknqsvpzeheeytlrjmp.supabase.co/storage/v1/object/public/bonay/happy_moamen.png,3,false,2026-09-21 07:29:20.931518+00

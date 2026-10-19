@@ -7,8 +7,7 @@
     {
       "binding": "DB",
       "database_name": "bunay",
-      // Replace with the id printed by `npx wrangler d1 create bunay`.
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "35ce0a36-7306-4ebf-96bc-6b422f3d370f",
       "migrations_dir": "migrations"
     }
   ],

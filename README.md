@@ -60,8 +60,10 @@ npm run deploy
 ### ما الذي يوجد في worker/؟
 
 - `migrations/0001_init.sql`: الجداول `playlists` و`videos` و`attachments` مع Foreign Keys وCascade وIndexes.
-- `seed/data.sql`: المحتوى الحالي (تم تصديره من Supabase).
-- `scripts/export-supabase.mjs`: سكربت التصدير من Supabase (للاستخدام مرة واحدة).
+- `seed/csv/`: ملفات CSV المصدّرة من Supabase (كل المحتوى، النشط وغير النشط).
+- `seed/data.sql`: المحتوى بصيغة D1، يُولَّد من ملفات CSV بالأمر `npm run seed:from-csv`.
+- `scripts/csv-to-seed.mjs`: يحوّل ملفات CSV إلى `seed/data.sql`.
+- `scripts/export-supabase.mjs`: تصدير مباشر من Supabase API (يحتاج service_role key لتصدير المحتوى غير النشط).
 - `src/index.ts`: كود الـAPI.
 
 في `wrangler.jsonc` يمكن تحديد `ALLOWED_ORIGINS` (مثل `https://your-project.pages.dev`) بدل `*` لتقييد من يستطيع استدعاء الـAPI من المتصفح.
@@ -184,7 +186,7 @@ Build output directory: dist
 5. أضف Environment variables في Cloudflare Pages:
 
 ```text
-VITE_API_URL=https://bunay-api.<subdomain>.workers.dev
+VITE_API_URL=https://bunay-api.bonai-season-4.workers.dev
 VITE_USE_DEMO_DATA=false
 ```
 

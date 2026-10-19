@@ -11,7 +11,8 @@
     "db:migrate:remote": "wrangler d1 migrations apply bunay --remote",
     "db:seed:local": "wrangler d1 execute bunay --local --file=seed/data.sql",
     "db:seed:remote": "wrangler d1 execute bunay --remote --file=seed/data.sql",
-    "export:supabase": "node scripts/export-supabase.mjs"
+    "export:supabase": "node scripts/export-supabase.mjs",
+    "seed:from-csv": "node scripts/csv-to-seed.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261019.1",
