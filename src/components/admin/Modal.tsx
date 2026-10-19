@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 export function Modal({ title, onClose, children, tone = 'default' }: { title: string; onClose: () => void; children: ReactNode; tone?: 'default' | 'danger' }) {
   useEffect(() => {
@@ -12,7 +13,8 @@ export function Modal({ title, onClose, children, tone = 'default' }: { title: s
     }
   }, [onClose])
 
-  return (
+  // Rendered on <body> so blurred or transformed ancestors (like the header) can't trap the fixed overlay.
+  return createPortal(
     <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <div className={`modal modal--${tone}`} role="dialog" aria-modal="true" aria-label={title}>
         <div className="modal__header">
@@ -21,6 +23,7 @@ export function Modal({ title, onClose, children, tone = 'default' }: { title: s
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
