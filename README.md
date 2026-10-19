@@ -6,7 +6,7 @@
 
 - React + Vite + TypeScript
 - React Router
-- Cloudflare Workers (API) + Cloudflare D1 (SQLite)
+- Express.js (MVC) على Cloudflare Workers + Cloudflare D1 (SQLite)
 - Cloudflare Pages (الواجهة)
 - Google Drive preview player / Direct MP4
 - Plain CSS (بدون UI framework ثقيل)
@@ -64,7 +64,19 @@ npm run deploy
 - `seed/data.sql`: المحتوى بصيغة D1، يُولَّد من ملفات CSV بالأمر `npm run seed:from-csv`.
 - `scripts/csv-to-seed.mjs`: يحوّل ملفات CSV إلى `seed/data.sql`.
 - `scripts/export-supabase.mjs`: تصدير مباشر من Supabase API (يحتاج service_role key لتصدير المحتوى غير النشط).
-- `src/index.ts`: كود الـAPI.
+- `src/`: كود الـAPI بنمط MVC باستخدام Express:
+
+```text
+src/
+├── index.ts         نقطة البداية: تشغيل Express على Workers
+├── app.ts           إعداد Express (CORS، الـmiddleware، الـroutes)
+├── config/          الاتصال بـD1 والإعدادات
+├── models/          استعلامات قاعدة البيانات (Model)
+├── views/           شكل الـJSON المرسل للواجهة (View)
+├── controllers/     منطق كل endpoint (Controller)
+├── routes/          ربط الروابط بالـcontrollers
+└── middleware/      cache، 404، 405، معالجة الأخطاء
+```
 
 في `wrangler.jsonc` يمكن تحديد `ALLOWED_ORIGINS` (مثل `https://your-project.pages.dev`) بدل `*` لتقييد من يستطيع استدعاء الـAPI من المتصفح.
 
@@ -216,7 +228,7 @@ worker/
 ├── migrations/     D1 schema
 ├── seed/           D1 content
 ├── scripts/        Supabase export
-└── src/            Worker API
+└── src/            Express API (MVC)
 supabase/           SQL القديم (مرجع فقط)
 ```
 
