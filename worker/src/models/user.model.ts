@@ -37,8 +37,14 @@ export const UserModel = {
     await db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(passwordHash, id).run()
   },
 
-  async updateProfile(id: string, data: { name: string; phone: string | null }): Promise<UserRow> {
-    const user = await db.prepare('UPDATE users SET name = ?, phone = ? WHERE id = ? RETURNING *').bind(data.name, data.phone, id).first<UserRow>()
+  // Updates only the fields that are given.
+  async updateProfile(id: string, data: { name?: string; phone?: string | null }): Promise<UserRow> {
+    const fields = Object.entries(data).filter(([, value]) => value !== undefined)
+    if (!fields.length) return (await db.prepare('SELECT * FROM users WHERE id = ?').bind(id).first<UserRow>())!
+    const user = await db
+      .prepare(`UPDATE users SET ${fields.map(([column]) => `${column} = ?`).join(', ')} WHERE id = ? RETURNING *`)
+      .bind(...fields.map(([, value]) => value), id)
+      .first<UserRow>()
     return user!
   },
 }

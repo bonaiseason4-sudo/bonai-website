@@ -61,7 +61,6 @@ export function PlaylistPage() {
           <h1>{playlist.title}</h1>
           {isAdmin && <AdminMenu label={playlist.title} onEdit={() => setEditor({ mode: 'edit', kind: 'playlist', values: playlistValues(playlist), originalId: playlist.id })} onDelete={() => setEditor({ mode: 'delete', kind: 'playlist', id: playlist.id, title: playlist.title })} />}
         </div>
-        {isAdmin && !playlist.is_active && <p className="admin-notice">هذه السلسلة مخفية عن الزوار. يراها المشرفون فقط.</p>}
         <p>{playlist.description}</p>
       </header>
     </>

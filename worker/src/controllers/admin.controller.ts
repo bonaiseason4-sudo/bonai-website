@@ -19,7 +19,6 @@ function readPlaylist(body: Record<string, unknown>): PlaylistInput {
     description: optionalText(body.description),
     image_url: optionalText(body.image_url),
     sort_order: sortOrder(body.sort_order),
-    is_active: flag(body.is_active, true),
   }
 }
 
@@ -65,7 +64,7 @@ export const AdminPlaylistController = {
     res.json((await PlaylistModel.findAll()).map(playlistView))
   },
   async show(req: Request<IdParams>, res: Response) {
-    const playlist = await PlaylistModel.findById(req.params.id)
+    const playlist = await PlaylistModel.findActiveById(req.params.id)
     return playlist ? void res.json(playlistView(playlist)) : notFound(res, 'Playlist')
   },
   async videos(req: Request<IdParams>, res: Response) {

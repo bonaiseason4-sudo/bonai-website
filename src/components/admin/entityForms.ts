@@ -49,7 +49,7 @@ export const entityFields: Record<EntityKind, FieldConfig[]> = {
     { name: 'description', label: 'الوصف', type: 'textarea' },
     { name: 'image_url', label: 'رابط الصورة', type: 'url', ltr: true },
     sortField,
-    visibleField,
+    // No visibility toggle: playlists are hidden or shown from the database only.
   ],
   video: [
     { name: 'id', label: 'ID', type: 'text', required: true, ltr: true, hint: idHint },
@@ -83,7 +83,7 @@ const text = (value: string | null | undefined) => value ?? ''
 export function playlistValues(playlist?: Playlist, sortOrder = 0): FormValues {
   return {
     id: text(playlist?.id), title: text(playlist?.title), description: text(playlist?.description), image_url: text(playlist?.image_url),
-    sort_order: String(playlist?.sort_order ?? sortOrder), is_active: playlist?.is_active ?? true,
+    sort_order: String(playlist?.sort_order ?? sortOrder),
   }
 }
 

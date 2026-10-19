@@ -11,10 +11,10 @@
 // GET   /api/auth/me        (Bearer token)               -> {user}
 // POST  /api/auth/logout    (Bearer token)
 // GET   /api/profile        (Bearer token)               -> {profile}
-// PATCH /api/profile        (Bearer token) {name, phone} -> {profile}
+// PATCH /api/profile        (Bearer token) {name?, phone?} -> {profile}, only the given fields change
 // PUT   /api/profile/password (Bearer token) {password}  -> 204, logs out other devices
 //
-// Admin only (Bearer token of a user with role 'admin'); reads include hidden content:
+// Admin only (Bearer token of a user with role 'admin'); reads include hidden lessons/attachments, not hidden playlists:
 // GET  /api/admin/playlists | /api/admin/playlists/:id | /api/admin/playlists/:id/videos | /api/admin/videos/:id/attachments
 // POST /api/admin/{playlists|videos|attachments}         create (the body carries the ID)
 // PUT  /api/admin/{playlists|videos|attachments}/:id     replace; may change the ID

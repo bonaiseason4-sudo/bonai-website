@@ -2,7 +2,8 @@ import { Router } from 'express'
 import { AdminAttachmentController, AdminPlaylistController, AdminVideoController } from '../controllers/admin.controller'
 import { requireAuth, requireRole } from '../middleware/auth'
 
-// Everything here needs a logged-in admin. Reads include hidden (is_active = 0) content.
+// Everything here needs a logged-in admin. Reads include hidden lessons and attachments;
+// hidden playlists are left out and can only be changed in the database.
 export const adminRoutes = Router()
 
 adminRoutes.use(requireAuth, requireRole('admin'))

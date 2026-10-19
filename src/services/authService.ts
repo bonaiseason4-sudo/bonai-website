@@ -40,7 +40,7 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
-export async function updateProfile(data: { name: string; phone: string }): Promise<User> {
+export async function updateProfile(data: { name?: string; phone?: string }): Promise<User> {
   const { profile } = await apiRequest<{ profile: User }>('/api/profile', { method: 'PATCH', body: data })
   return profile
 }

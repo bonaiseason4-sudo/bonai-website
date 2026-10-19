@@ -10,10 +10,13 @@ export const ProfileController = {
     res.json({ profile: profileView(res.locals.user) })
   },
 
+  // Send only the fields to change, e.g. {name} or {phone}.
   async update(req: Request, res: Response) {
-    const name = arabicName(req.body?.name)
-    const phone = readPhone(req.body?.phone)
-    const user = await UserModel.updateProfile((res.locals.user as UserRow).id, { name, phone })
+    const body = req.body ?? {}
+    const user = await UserModel.updateProfile((res.locals.user as UserRow).id, {
+      name: 'name' in body ? arabicName(body.name) : undefined,
+      phone: 'phone' in body ? readPhone(body.phone) : undefined,
+    })
     res.json({ profile: profileView(user) })
   },
 
