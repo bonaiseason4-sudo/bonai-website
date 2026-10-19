@@ -16,7 +16,7 @@ export interface Video {
   description: string | null
   drive_file_id: string | null
   video_url: string | null
-  video_source: 'GOOGLE_DRIVE' | 'DIRECT'
+  video_source: 'GOOGLE_DRIVE' | 'DIRECT' | null
   sort_order: number
   is_active: boolean
   isQuiz?: boolean | number

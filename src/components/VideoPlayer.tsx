@@ -2,7 +2,7 @@ import { getVideoEmbed } from '../lib/videoSource'
 import type { Video } from '../types/content'
 
 export function VideoPlayer({ video }: { video: Video }) {
-  const source = video.video_source === 'GOOGLE_DRIVE' ? video.drive_file_id : video.video_url
+  const source = video.video_source === 'GOOGLE_DRIVE' ? video.drive_file_id : video.video_source === 'DIRECT' ? video.video_url : (video.drive_file_id || video.video_url)
   const embed = getVideoEmbed(source, video.video_source)
 
   if (!embed) {

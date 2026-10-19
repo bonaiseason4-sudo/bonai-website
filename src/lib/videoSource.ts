@@ -5,7 +5,7 @@ export type VideoEmbed =
   | { kind: 'iframe'; url: string }
   | { kind: 'native'; urls: string[] }
 
-export function getVideoEmbed(source: string | null, sourceType?: 'GOOGLE_DRIVE' | 'DIRECT'): VideoEmbed | null {
+export function getVideoEmbed(source: string | null, sourceType?: 'GOOGLE_DRIVE' | 'DIRECT' | null): VideoEmbed | null {
   const value = source?.trim() ?? ''
   if (!value || value.startsWith('DEMO_')) return null
 

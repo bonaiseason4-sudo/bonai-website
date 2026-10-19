@@ -18,11 +18,7 @@ create table if not exists public.videos (
   description text,
   drive_file_id text,
   video_url text,
-  video_source text not null check (video_source in ('GOOGLE_DRIVE', 'DIRECT')),
-  check (
-    (video_source = 'GOOGLE_DRIVE' and char_length(trim(coalesce(drive_file_id, ''))) >= 10 and video_url is null)
-    or (video_source = 'DIRECT' and char_length(trim(coalesce(video_url, ''))) >= 10 and drive_file_id is null)
-  ),
+  video_source text,
   sort_order integer not null default 0 check (sort_order >= 0),
   is_active boolean not null default true,
   "isQuiz" boolean not null default false,
