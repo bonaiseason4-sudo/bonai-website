@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bunay-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bunay",
+      // Replace with the id printed by `npx wrangler d1 create bunay`.
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    // Comma-separated list of frontend origins allowed to call the API. "*" allows any origin.
+    "ALLOWED_ORIGINS": "*"
+  }
+}

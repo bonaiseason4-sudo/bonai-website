@@ -1,0 +1,21 @@
+{
+  "name": "bunay-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "db:migrate:local": "wrangler d1 migrations apply bunay --local",
+    "db:migrate:remote": "wrangler d1 migrations apply bunay --remote",
+    "db:seed:local": "wrangler d1 execute bunay --local --file=seed/data.sql",
+    "db:seed:remote": "wrangler d1 execute bunay --remote --file=seed/data.sql",
+    "export:supabase": "node scripts/export-supabase.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261019.1",
+    "typescript": "~5.9.2",
+    "wrangler": "^4.151.2"
+  }
+}

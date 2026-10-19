@@ -32,7 +32,7 @@ export function HomePage() {
 
       <section className="section shell" id="playlists">
         <div className="section-heading"><div><span className="eyebrow">اختر رحلتك</span><h2>السلاسل التعليمية</h2></div><p>كل سلسلة مقسمة إلى دروس قصيرة ومنظمة لتكون المتابعة أبسط وأمتع.</p></div>
-        {usingDemoData && <div className="demo-banner">أنت تشاهد بيانات تجريبية الآن. عند إضافة مفاتيح Supabase سيظهر المحتوى الحقيقي تلقائيًا.</div>}
+        {usingDemoData && <div className="demo-banner">أنت تشاهد بيانات تجريبية الآن. عند ضبط رابط الـAPI سيظهر المحتوى الحقيقي تلقائيًا.</div>}
         {loading && <LoadingCards />}
         {error && <StatePanel icon="!" title="لم نستطع تحميل السلاسل"><p>تأكد من إعداد Supabase واتصالك بالإنترنت ثم أعد تحميل الصفحة.</p></StatePanel>}
         {!loading && !error && playlists?.length === 0 && <StatePanel icon="✦" title="لا توجد سلاسل بعد"><p>أضف أول Playlist من Supabase وستظهر هنا مباشرة.</p></StatePanel>}
