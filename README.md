@@ -41,6 +41,7 @@ GET   /api/auth/me                                       المستخدم الح
 POST  /api/auth/logout                                   تسجيل الخروج
 GET   /api/profile                                       الملف الشخصي
 PATCH /api/profile         {phone}                       تعديل رقم الهاتف
+PUT   /api/profile/password {password}                  تغيير كلمة المرور (بدون القديمة، ويسجّل الخروج من الأجهزة الأخرى)
 ```
 
 - اسم المستخدم فريد (بدون تفرقة بين الحروف الكبيرة والصغيرة).

@@ -45,6 +45,10 @@ export async function updateProfile(data: { phone: string }): Promise<User> {
   return profile
 }
 
+export async function changePassword(password: string): Promise<void> {
+  await apiRequest('/api/profile/password', { method: 'PUT', body: { password } })
+}
+
 // Arabic message for an error returned by the API.
 export function authErrorMessage(error: unknown): string {
   if (!(error instanceof ApiError)) return 'تعذّر الاتصال بالخادم. تأكد من الإنترنت وحاول مرة أخرى.'

@@ -32,6 +32,10 @@ export const UserModel = {
     }
   },
 
+  async updatePassword(id: string, passwordHash: string): Promise<void> {
+    await db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(passwordHash, id).run()
+  },
+
   async updateProfile(id: string, data: { phone: string | null }): Promise<UserRow> {
     const user = await db.prepare('UPDATE users SET phone = ? WHERE id = ? RETURNING *').bind(data.phone, id).first<UserRow>()
     return user!

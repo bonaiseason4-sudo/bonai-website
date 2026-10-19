@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { authErrorMessage, updateProfile } from '../services/authService'
+import { authErrorMessage, changePassword, updateProfile } from '../services/authService'
 import type { User } from '../types/auth'
 
 const roleLabels = { user: 'طالب', admin: 'مشرف' } as const
@@ -69,10 +69,58 @@ function ProfileCard({ user }: { user: User }) {
           {message && <p className={message.type === 'error' ? 'form-error' : 'form-success'} role="status">{message.text}</p>}
           <div className="profile-actions">
             <button className="primary-button" type="submit" disabled={saving || phone === (user.phone ?? '')}>{saving ? 'جارٍ الحفظ...' : 'حفظ'}</button>
-            <button className="secondary-button" type="button" onClick={handleLogout}>تسجيل الخروج</button>
           </div>
         </form>
+
+        <ChangePasswordForm />
+
+        <button className="secondary-button profile-logout" type="button" onClick={handleLogout}>تسجيل الخروج</button>
       </div>
     </section>
+  )
+}
+
+function ChangePasswordForm() {
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    setMessage(null)
+    if (password !== confirm) {
+      setMessage({ type: 'error', text: 'كلمتا المرور غير متطابقتين.' })
+      return
+    }
+    setSaving(true)
+    try {
+      await changePassword(password)
+      setPassword('')
+      setConfirm('')
+      setMessage({ type: 'success', text: 'تم تغيير كلمة المرور. تم تسجيل خروجك من الأجهزة الأخرى.' })
+    } catch (error) {
+      setMessage({ type: 'error', text: authErrorMessage(error) })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <form className="profile-section" onSubmit={handleSubmit}>
+      <h2>تغيير كلمة المرور</h2>
+      <label className="field">
+        <span>كلمة المرور الجديدة</span>
+        <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" required />
+      </label>
+      <label className="field">
+        <span>تأكيد كلمة المرور</span>
+        <input type="password" value={confirm} onChange={(event) => setConfirm(event.target.value)} autoComplete="new-password" required />
+      </label>
+      {message && <p className={message.type === 'error' ? 'form-error' : 'form-success'} role="status">{message.text}</p>}
+      <div className="profile-actions">
+        <button className="primary-button" type="submit" disabled={saving || !password || !confirm}>{saving ? 'جارٍ الحفظ...' : 'تغيير كلمة المرور'}</button>
+      </div>
+    </form>
   )
 }

@@ -11,6 +11,7 @@
 // POST  /api/auth/logout    (Bearer token)
 // GET   /api/profile        (Bearer token)               -> {profile}
 // PATCH /api/profile        (Bearer token) {phone}       -> {profile}
+// PUT   /api/profile/password (Bearer token) {password}  -> 204, logs out other devices
 
 import { httpServerHandler } from 'cloudflare:node'
 import { app } from './app'

@@ -209,6 +209,9 @@ main { flex: 1; }
 .profile-soon p { margin: 4px 0 0; font-size: .88rem; line-height: 1.8; }
 .profile-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 .profile-actions .primary-button { border: 0; cursor: pointer; flex: 1; }
+.profile-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+.profile-section h2 { margin: 0 0 16px; font-size: 1.15rem; color: var(--green); }
+.profile-logout { width: 100%; margin-top: 28px; }
 @media (max-width: 980px) {
   .hero-grid { grid-template-columns: 1fr; padding: 70px 0 60px; gap: 18px; text-align: center; }
   .hero-copy > p { margin-inline: auto; }

@@ -27,6 +27,11 @@ export const SessionModel = {
       .first<UserRow>()
   },
 
+  // Logs the user out everywhere except the session making the request.
+  async deleteOthers(userId: string, keepToken: string): Promise<void> {
+    await db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash != ?').bind(userId, await sha256(keepToken)).run()
+  },
+
   async delete(token: string): Promise<void> {
     await db.prepare('DELETE FROM sessions WHERE token_hash = ?').bind(await sha256(token)).run()
   },
