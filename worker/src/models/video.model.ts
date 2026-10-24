@@ -11,15 +11,20 @@ export interface VideoRow {
   sort_order: number
   is_active: number
   is_quiz: number
+  // Attendance window (ISO UTC); both null = the lesson is outside the streak.
+  attend_from: string | null
+  attend_until: string | null
   created_at: string
 }
 
 export type VideoInput = Omit<VideoRow, 'created_at'>
 
-const COLUMNS = 'id, playlist_id, title, description, drive_file_id, video_url, video_source, sort_order, is_active, is_quiz'
+export type AttendableLesson = Pick<VideoRow, 'id' | 'playlist_id' | 'attend_from' | 'attend_until'>
+
+const COLUMNS = 'id, playlist_id, title, description, drive_file_id, video_url, video_source, sort_order, is_active, is_quiz, attend_from, attend_until'
 
 function values(data: VideoInput) {
-  return [data.id, data.playlist_id, data.title, data.description, data.drive_file_id, data.video_url, data.video_source, data.sort_order, data.is_active, data.is_quiz]
+  return [data.id, data.playlist_id, data.title, data.description, data.drive_file_id, data.video_url, data.video_source, data.sort_order, data.is_active, data.is_quiz, data.attend_from, data.attend_until]
 }
 
 export const VideoModel = {
@@ -42,9 +47,21 @@ export const VideoModel = {
     return results
   },
 
+  // Every lesson a student can mark attendance on (active, not a quiz, in an active playlist), across all playlists.
+  async findAttendable(): Promise<AttendableLesson[]> {
+    const { results } = await db
+      .prepare(
+        `SELECT v.id, v.playlist_id, v.attend_from, v.attend_until FROM videos v
+         JOIN playlists p ON p.id = v.playlist_id
+         WHERE v.is_active = 1 AND v.is_quiz = 0 AND p.is_active = 1`,
+      )
+      .all<AttendableLesson>()
+    return results
+  },
+
   async create(data: VideoInput): Promise<VideoRow> {
     const row = await db
-      .prepare(`INSERT INTO videos (${COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`)
+      .prepare(`INSERT INTO videos (${COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`)
       .bind(...values(data))
       .first<VideoRow>()
     return row!
@@ -54,7 +71,8 @@ export const VideoModel = {
   async update(id: string, data: VideoInput): Promise<VideoRow | null> {
     return db
       .prepare(
-        `UPDATE videos SET id = ?, playlist_id = ?, title = ?, description = ?, drive_file_id = ?, video_url = ?, video_source = ?, sort_order = ?, is_active = ?, is_quiz = ?
+        `UPDATE videos SET id = ?, playlist_id = ?, title = ?, description = ?, drive_file_id = ?, video_url = ?, video_source = ?, sort_order = ?, is_active = ?, is_quiz = ?,
+             attend_from = ?, attend_until = ?
          WHERE id = ? RETURNING *`,
       )
       .bind(...values(data), id)

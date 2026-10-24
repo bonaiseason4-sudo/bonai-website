@@ -21,6 +21,9 @@ export interface Video {
   is_active: boolean
   isQuiz?: boolean | number
   created_at: string
+  // Attendance window (ISO UTC). Both null: the lesson is outside the streak.
+  attend_from: string | null
+  attend_until: string | null
 }
 
 export type AttachmentType = 'PDF' | 'POWERPOINT' | 'WORD' | 'SPREADSHEET' | 'GOOGLE_FORM' | 'GEMINI_QUIZ' | 'LINK' | 'OTHER'

@@ -5,7 +5,7 @@ export function userView({ id, username, name, phone, role, created_at }: UserRo
   return { id, username, name, phone, role, created_at }
 }
 
-// The user's own profile page. Attendance, streaks and daily questions will be added here later.
+// The user's own profile page. Streak and points come from GET /api/progress; daily questions will be added later.
 export function profileView(user: UserRow) {
   return userView(user)
 }

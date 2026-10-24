@@ -43,6 +43,27 @@ export function oneOf<T extends string>(value: unknown, options: readonly T[], f
   return value as T
 }
 
+// Four-digit years only, so stored dates compare correctly as text.
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
+
+function isoDate(value: unknown, field: string): string | null {
+  const text = typeof value === 'string' ? value.trim() : value
+  if (text === undefined || text === null || text === '') return null
+  const time = typeof text === 'string' && ISO_DATE_PATTERN.test(text) ? Date.parse(text) : NaN
+  const iso = Number.isNaN(time) ? '' : new Date(time).toISOString()
+  if (!ISO_DATE_PATTERN.test(iso)) throw new ValidationError(`${field} must be an ISO date and time`, 'INVALID_WINDOW')
+  return iso
+}
+
+// A lesson's attendance window, stored as ISO UTC. Both ends or neither ('' or null = outside the streak).
+export function attendanceWindow(from: unknown, until: unknown): { attend_from: string | null; attend_until: string | null } {
+  const start = isoDate(from, 'Attendance start')
+  const end = isoDate(until, 'Attendance end')
+  if ((start === null) !== (end === null)) throw new ValidationError('Set both the attendance start and end, or neither', 'INVALID_WINDOW')
+  if (start !== null && end !== null && end <= start) throw new ValidationError('Attendance end must be after its start', 'INVALID_WINDOW')
+  return { attend_from: start, attend_until: end }
+}
+
 // Usernames are for logging in: English letters, numbers and _ only.
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{1,50}$/
 // Display names: Arabic letters and spaces only. Script_Extensions (not Script) so diacritics like ُ count as Arabic.

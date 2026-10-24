@@ -1,15 +1,18 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AddTile } from '../components/admin/AddTile'
 import { AdminEditor, type EditorResult, type EditorState } from '../components/admin/AdminEditor'
 import { AdminMenu } from '../components/admin/AdminMenu'
 import { attachmentValues, nextSortOrder, playlistValues, videoValues } from '../components/admin/entityForms'
+import { AttendanceButtons } from '../components/attendance/AttendanceButtons'
 import { StatePanel } from '../components/StatePanel'
 import { AttachmentList } from '../components/AttachmentList'
 import { VideoList } from '../components/VideoList'
 import { VideoPlayer } from '../components/VideoPlayer'
 import { useAsync } from '../hooks/useAsync'
+import { useAttendance } from '../hooks/useAttendance'
 import { useAuth } from '../hooks/useAuth'
+import { useNow } from '../hooks/useNow'
 import { getPlaylist, getPlaylistVideos, getVideoAttachments } from '../services/contentService'
 import type { Attachment, Video } from '../types/content'
 
@@ -20,10 +23,22 @@ export function PlaylistPage() {
   const isAdmin = user?.role === 'admin'
   const { data: playlist, loading: playlistLoading, error: playlistError, reload: reloadPlaylist } = useAsync(() => getPlaylist(id, isAdmin), [id, isAdmin])
   const { data: videos, loading: videosLoading, error: videosError, reload: reloadVideos } = useAsync(() => getPlaylistVideos(id, isAdmin), [id, isAdmin])
-  const [selectedId, setSelectedId] = useState<string>('')
+  // The open lesson lives in the URL (?lesson=), so a guest sent to log in comes back to the same lesson.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const selectedId = searchParams.get('lesson') ?? ''
+  const setSelectedId = useCallback((videoId: string) => {
+    setSearchParams((params) => {
+      const next = new URLSearchParams(params)
+      next.set('lesson', videoId)
+      return next
+    }, { replace: true })
+  }, [setSearchParams])
   const [editor, setEditor] = useState<EditorState>(null)
+  const attendance = useAttendance(id)
+  // Windows open and close while the page is open; re-check the buttons every minute.
+  const now = useNow()
 
-  useEffect(() => { if (videos?.length && !videos.some((v) => v.id === selectedId)) setSelectedId(videos[0].id) }, [videos, selectedId])
+  // No lesson in the URL, or one that is gone: open the first lesson.
   const selectedVideo = useMemo(() => videos?.find((video) => video.id === selectedId) ?? videos?.[0] ?? null, [videos, selectedId])
   const lessonVideos = useMemo(() => videos?.filter((video) => !video.isQuiz) ?? [], [videos])
   const selectedIsQuiz = selectedVideo?.isQuiz === true || selectedVideo?.isQuiz === 1
@@ -36,7 +51,7 @@ export function PlaylistPage() {
       else if (result.id !== id) navigate(`/playlist/${encodeURIComponent(result.id)}`, { replace: true })
       else reloadPlaylist()
     } else if (result.kind === 'video') {
-      if (result.mode === 'create' || (result.mode === 'edit' && result.previousId === selectedId)) setSelectedId(result.id)
+      if (result.mode === 'create' || (result.mode === 'edit' && result.previousId === selectedVideo?.id)) setSelectedId(result.id)
       reloadVideos()
       reloadPlaylist()
     } else reloadAttachments()
@@ -47,6 +62,8 @@ export function PlaylistPage() {
   const videoMenu = isAdmin ? (video: Video) => <AdminMenu label={video.title} onEdit={() => setEditor({ mode: 'edit', kind: 'video', values: videoValues(video, id), originalId: video.id })} onDelete={() => setEditor({ mode: 'delete', kind: 'video', id: video.id, title: video.title })} /> : undefined
   const attachmentMenu = isAdmin ? (attachment: Attachment) => <AdminMenu label={attachment.title} onEdit={() => setEditor({ mode: 'edit', kind: 'attachment', values: attachmentValues(attachment, attachment.video_id), originalId: attachment.id })} onDelete={() => setEditor({ mode: 'delete', kind: 'attachment', id: attachment.id, title: attachment.title })} /> : undefined
   const addAttachmentTile = isAdmin && selectedVideo && <AddTile label="إضافة مرفق" onClick={() => setEditor({ mode: 'create', kind: 'attachment', values: attachmentValues(undefined, selectedVideo.id, nextSortOrder(attachments)) })} />
+  const attendanceButtons = (video: Video, size: 'compact' | 'large' = 'compact') => <AttendanceButtons video={video} attendance={attendance.marks[video.id]} now={now} busy={attendance.isBusy(video.id)} size={size} onChoose={(kind) => attendance.choose(video, kind)} />
+  const renderAttendance = attendance.enabled ? attendanceButtons : undefined
 
   if (playlistLoading || videosLoading) return <section className="section shell"><div className="playlist-page-skeleton"><div className="skeleton skeleton-line wide" /><div className="skeleton skeleton-video" /><div className="skeleton skeleton-line" /></div></section>
   if (playlistError || videosError) return <section className="section shell"><StatePanel icon="!" title="تعذّر تحميل السلسلة"><p>تأكد من اتصالك بالإنترنت ثم حاول مرة أخرى.</p></StatePanel></section>
@@ -84,12 +101,12 @@ export function PlaylistPage() {
         <div className={`watch-layout ${selectedIsQuiz ? 'watch-layout--quiz' : ''}`}>
           <div className="watch-main">
             {selectedVideo && !selectedIsQuiz && <VideoPlayer video={selectedVideo} />}
-            {selectedVideo && !selectedIsQuiz && <div className="current-video-copy"><span>الدرس {lessonVideos.findIndex((v) => v.id === selectedVideo.id) + 1} من {lessonVideos.length}</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
+            {selectedVideo && !selectedIsQuiz && <div className="current-video-copy"><span>الدرس {lessonVideos.findIndex((v) => v.id === selectedVideo.id) + 1} من {lessonVideos.length}</span><h2>{selectedVideo.title}</h2>{selectedVideo.is_active && renderAttendance?.(selectedVideo, 'large')}<p>{selectedVideo.description || 'استمتع بالدرس، ثم انتقل للدرس التالي من القائمة.'}</p></div>}
             {selectedVideo && selectedIsQuiz
               ? <section className="quiz-stage"><span className="quiz-stage__eyebrow">اختبار تفاعلي</span><h2>{selectedVideo.title}</h2><p>{selectedVideo.description || 'اختبر ما تعلمته في هذه السلسلة، وارجع إلى الدروس متى احتجت إلى مراجعة أي جزء.'}</p><AttachmentList attachments={attachments ?? []} quizOnly renderMenu={attachmentMenu} footer={addAttachmentTile} /></section>
               : <AttachmentList attachments={attachments ?? []} renderMenu={attachmentMenu} footer={addAttachmentTile} />}
           </div>
-          <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{lessonVideos.length} {lessonVideos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} renderMenu={videoMenu} footer={addVideoTile} /></aside>
+          <aside className="lessons-panel"><div className="lessons-panel__header"><div><span>دروس السلسلة</span><strong>{lessonVideos.length} {lessonVideos.length === 1 ? 'درس' : 'دروس'}</strong></div><span aria-hidden="true">☰</span></div><VideoList videos={videos} activeId={selectedVideo?.id ?? ''} onSelect={(video: Video) => { setSelectedId(video.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }} renderAttendance={renderAttendance} renderMenu={videoMenu} showWindow={isAdmin} footer={addVideoTile} /></aside>
         </div>
       </div>
       {editorDialog}

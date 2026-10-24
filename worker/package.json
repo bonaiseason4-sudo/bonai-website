@@ -7,6 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
+    "test": "node --test scripts/progress.test.mjs scripts/badges.test.mjs",
     "db:migrate:local": "wrangler d1 migrations apply bunay --local",
     "db:migrate:remote": "wrangler d1 migrations apply bunay --remote",
     "db:seed:local": "wrangler d1 execute bunay --local --file=seed/data.sql",

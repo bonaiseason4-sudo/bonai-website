@@ -8,12 +8,15 @@ import { LoadingCards } from '../components/LoadingCards'
 import { StatePanel } from '../components/StatePanel'
 import { useAsync } from '../hooks/useAsync'
 import { useAuth } from '../hooks/useAuth'
+import { useProgress } from '../hooks/useProgress'
 import { getPlaylists, usingDemoData } from '../services/contentService'
 import logo from '../assets/bunay-logo.png'
 import tarteelLogo from '../assets/jamiyat-altarteel-logo.jpg'
 
 export function HomePage() {
   const { user } = useAuth()
+  // Cleared on logout, so guests never see attendance counts.
+  const { progress } = useProgress()
   const isAdmin = user?.role === 'admin'
   const { data: playlists, loading, error, reload } = useAsync(() => getPlaylists(isAdmin), [isAdmin])
   const [editor, setEditor] = useState<EditorState>(null)
@@ -50,7 +53,7 @@ export function HomePage() {
           <div className="playlist-grid">
             {playlists.map((playlist, index) => (
               <div className="playlist-card-wrap" key={playlist.id}>
-                <PlaylistCard playlist={playlist} index={index} />
+                <PlaylistCard playlist={playlist} index={index} attended={user ? progress?.playlist_progress[playlist.id] : undefined} />
                 {isAdmin && <div className="playlist-card-wrap__menu"><AdminMenu label={playlist.title} onEdit={() => setEditor({ mode: 'edit', kind: 'playlist', values: playlistValues(playlist), originalId: playlist.id })} onDelete={() => setEditor({ mode: 'delete', kind: 'playlist', id: playlist.id, title: playlist.title })} /></div>}
               </div>
             ))}

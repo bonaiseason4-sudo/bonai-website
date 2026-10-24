@@ -29,6 +29,7 @@ export function adminErrorMessage(error: unknown, kind: EntityKind): string {
   if (!(error instanceof ApiError)) return 'تعذّر الاتصال بالخادم. حاول مرة أخرى.'
   if (error.code === 'DUPLICATE_ID') return 'هذا الـID مستخدم بالفعل، اختر ID آخر.'
   if (error.code === 'MISSING_PARENT') return parentLabels[kind]
+  if (error.code === 'INVALID_WINDOW') return 'ميعاد الحضور غير صحيح: اكتب البداية والنهاية معًا، والنهاية بعد البداية.'
   if (error.status === 401) return 'انتهت الجلسة، سجّل الدخول مرة أخرى.'
   if (error.status === 403) return 'هذه العملية للمشرفين فقط.'
   if (error.status === 404) return 'العنصر غير موجود، ربما حُذف بالفعل.'

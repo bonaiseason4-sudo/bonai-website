@@ -1,3 +1,4 @@
+import { addDays, isoToLocalInput, localInputToIso, toLocalInput } from '../../lib/dates'
 import type { EntityKind } from '../../services/adminService'
 import type { Attachment, AttachmentType, Playlist, Video } from '../../types/content'
 
@@ -6,7 +7,8 @@ export type FormValues = Record<string, string | boolean>
 export interface FieldConfig {
   name: string
   label: string
-  type: 'text' | 'textarea' | 'url' | 'number' | 'checkbox' | 'select'
+  // datetime: a local date and time in the form, sent to the API as ISO UTC.
+  type: 'text' | 'textarea' | 'url' | 'number' | 'checkbox' | 'select' | 'datetime'
   required?: boolean
   hint?: string
   options?: { value: string; label: string }[]
@@ -63,6 +65,9 @@ export const entityFields: Record<EntityKind, FieldConfig[]> = {
     },
     { name: 'drive_file_id', label: 'Google Drive File ID أو الرابط', type: 'text', ltr: true, required: true, showIf: (values) => values.video_source === 'GOOGLE_DRIVE' },
     { name: 'video_url', label: 'رابط الفيديو', type: 'url', ltr: true, required: true, showIf: (values) => values.video_source === 'DIRECT' },
+    // Quizzes are outside the streak, so they have no attendance window.
+    { name: 'attend_from', label: 'بداية الحضور', type: 'datetime', ltr: true, showIf: (values) => values.isQuiz !== true },
+    { name: 'attend_until', label: 'نهاية الحضور', type: 'datetime', ltr: true, hint: 'امسح الحقلين لو الدرس برا الاستريك', showIf: (values) => values.isQuiz !== true },
     sortField,
     visibleField,
   ],
@@ -88,10 +93,14 @@ export function playlistValues(playlist?: Playlist, sortOrder = 0): FormValues {
 }
 
 export function videoValues(video: Video | undefined, playlistId: string, sortOrder = 0): FormValues {
+  // A new lesson opens for attendance now, for a week.
+  const now = new Date()
   return {
     id: text(video?.id), playlist_id: video?.playlist_id ?? playlistId, title: text(video?.title), description: text(video?.description),
     isQuiz: video ? video.isQuiz === true || video.isQuiz === 1 : false,
     video_source: video ? text(video.video_source) : 'GOOGLE_DRIVE', drive_file_id: text(video?.drive_file_id), video_url: text(video?.video_url),
+    attend_from: video ? isoToLocalInput(video.attend_from) : toLocalInput(now),
+    attend_until: video ? isoToLocalInput(video.attend_until) : toLocalInput(addDays(now, 7)),
     sort_order: String(video?.sort_order ?? sortOrder), is_active: video?.is_active ?? true,
   }
 }
@@ -103,16 +112,28 @@ export function attachmentValues(attachment: Attachment | undefined, videoId: st
   }
 }
 
-// Turns form values into the API body: numbers for sort_order, hidden fields cleared.
+// Turns form values into the API body: numbers for sort_order, ISO UTC for dates, hidden fields cleared.
 export function toRequestBody(kind: EntityKind, values: FormValues): Record<string, unknown> {
   const body: Record<string, unknown> = {}
   for (const field of entityFields[kind]) {
     const value = values[field.name]
     if (field.showIf && !field.showIf(values)) body[field.name] = ''
     else if (field.type === 'number') body[field.name] = Number(value || 0)
+    else if (field.type === 'datetime') body[field.name] = localInputToIso(String(value ?? ''))
     else body[field.name] = typeof value === 'string' ? value.trim() : value
   }
   return body
+}
+
+// Same rule as the API's INVALID_WINDOW check, run first for an instant Arabic message.
+export function formError(kind: EntityKind, values: FormValues): string | null {
+  if (kind !== 'video' || values.isQuiz === true) return null
+  const from = localInputToIso(String(values.attend_from ?? ''))
+  const until = localInputToIso(String(values.attend_until ?? ''))
+  if (!from && !until) return null
+  if (!from || !until) return 'اكتب بداية ونهاية الحضور معًا، أو امسح الحقلين لو الدرس برا الاستريك.'
+  if (until <= from) return 'نهاية الحضور لازم تكون بعد بدايتها.'
+  return null
 }
 
 export function nextSortOrder(items: { sort_order: number }[] | null | undefined): number {

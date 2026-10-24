@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { flag, oneOf, optionalText, requiredId, requiredText, sortOrder, ValidationError } from '../lib/validate'
+import { attendanceWindow, flag, oneOf, optionalText, requiredId, requiredText, sortOrder, ValidationError } from '../lib/validate'
 import { ATTACHMENT_TYPES, AttachmentModel, type AttachmentInput } from '../models/attachment.model'
 import { PlaylistModel, type PlaylistInput } from '../models/playlist.model'
 import { VideoModel, type VideoInput } from '../models/video.model'
@@ -34,6 +34,7 @@ function readVideo(body: Record<string, unknown>): VideoInput {
     sort_order: sortOrder(body.sort_order),
     is_active: flag(body.is_active, true),
     is_quiz: flag(body.isQuiz, false),
+    ...attendanceWindow(body.attend_from, body.attend_until),
   }
   if (video.video_source === 'GOOGLE_DRIVE' && !video.drive_file_id) throw new ValidationError('Google Drive file ID is required')
   if (video.video_source === 'DIRECT' && !video.video_url) throw new ValidationError('Video URL is required')

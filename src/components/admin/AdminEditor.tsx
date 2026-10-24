@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react'
+import { useId, useState, type FormEvent } from 'react'
 import { adminErrorMessage, deleteEntity, saveEntity, type EntityKind } from '../../services/adminService'
-import { deleteWarnings, entityFields, entityLabels, toRequestBody, type FieldConfig, type FormValues } from './entityForms'
+import { deleteWarnings, entityFields, entityLabels, formError, toRequestBody, type FieldConfig, type FormValues } from './entityForms'
 import { Modal } from './Modal'
 
 export type EditorState =
@@ -32,6 +32,8 @@ function EntityFormDialog({ kind, initial, originalId, onClose, onDone }: { kind
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
+    const invalid = formError(kind, values)
+    if (invalid) return setError(invalid)
     setSaving(true)
     setError(null)
     try {
@@ -58,6 +60,21 @@ function EntityFormDialog({ kind, initial, originalId, onClose, onDone }: { kind
 }
 
 function Field({ field, value, onChange }: { field: FieldConfig; value: string | boolean | undefined; onChange: (value: string | boolean) => void }) {
+  const id = useId()
+  if (field.type === 'datetime') {
+    // Not wrapped in a <label>: the clear button can't sit inside one.
+    return (
+      <div className="field">
+        <label htmlFor={id}>{field.label}</label>
+        <div className="datetime-field">
+          <input id={id} type="datetime-local" dir="ltr" value={String(value ?? '')} onChange={(event) => onChange(event.target.value)} />
+          <button type="button" className="ghost-button datetime-field__clear" onClick={() => onChange('')} disabled={!value} aria-label={`مسح ${field.label}`} title={`مسح ${field.label}`}>مسح</button>
+        </div>
+        {field.hint && <small className="field__hint">{field.hint}</small>}
+      </div>
+    )
+  }
+
   if (field.type === 'checkbox') {
     return (
       <label className="check-field">

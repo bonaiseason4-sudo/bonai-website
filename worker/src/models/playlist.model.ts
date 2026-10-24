@@ -33,6 +33,12 @@ export const PlaylistModel = {
     return db.prepare('SELECT * FROM playlists WHERE id = ? AND is_active = 1').bind(id).first<PlaylistRow>()
   },
 
+  // Playlist badges are only awarded and listed while their playlist is on the site.
+  async findActiveIds(): Promise<Set<string>> {
+    const { results } = await db.prepare('SELECT id FROM playlists WHERE is_active = 1').all<{ id: string }>()
+    return new Set(results.map((row) => row.id))
+  },
+
   // Admin: active playlists only (hidden ones are managed in the database), counting hidden lessons too.
   async findAll(): Promise<PlaylistRow[]> {
     const { results } = await db
@@ -56,10 +62,20 @@ export const PlaylistModel = {
 
   // Only active playlists can be edited. Changing the id cascades to the playlist's videos (ON UPDATE CASCADE).
   async update(id: string, data: PlaylistInput): Promise<PlaylistRow | null> {
-    return db
+    const update = db
       .prepare('UPDATE playlists SET id = ?, title = ?, description = ?, image_url = ?, sort_order = ? WHERE id = ? AND is_active = 1 RETURNING *')
       .bind(data.id, data.title, data.description, data.image_url, data.sort_order, id)
-      .first<PlaylistRow>()
+    if (data.id === id) return update.first<PlaylistRow>()
+    // Completion badges keep the playlist id only inside rule_params JSON (no FK), so follow the rename by hand.
+    const [result] = await db.batch<PlaylistRow>([
+      update,
+      db
+        .prepare(
+          "UPDATE badges SET rule_params = json_set(rule_params, '$.playlist_id', ?) WHERE rule_type = 'complete_playlist' AND json_extract(rule_params, '$.playlist_id') = ? AND EXISTS (SELECT 1 FROM playlists WHERE id = ?)",
+        )
+        .bind(data.id, id, data.id),
+    ])
+    return result.results[0] ?? null
   },
 
   // Deletes the playlist's videos and their attachments too (ON DELETE CASCADE).

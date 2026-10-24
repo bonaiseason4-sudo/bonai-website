@@ -1,9 +1,15 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { FlameIcon, ShieldIcon } from '../components/attendance/icons'
+import { BadgeIcon } from '../components/badges/BadgeIcon'
 import { useAuth } from '../hooks/useAuth'
+import { useBadges } from '../hooks/useBadges'
+import { useProgress } from '../hooks/useProgress'
+import { freezeHint, multiplierHint } from '../lib/progressText'
 import { displayName, nameError, nameHint } from '../lib/userFields'
 import { authErrorMessage, changePassword, updateProfile } from '../services/authService'
 import type { User } from '../types/auth'
+import type { Progress } from '../types/progress'
 
 const roleLabels = { user: 'طالب', admin: 'مشرف' } as const
 
@@ -20,6 +26,7 @@ export function ProfilePage() {
 
 function ProfileView({ user }: { user: User }) {
   const { logout } = useAuth()
+  const { progress } = useProgress()
   const navigate = useNavigate()
   // Accounts from before names existed open on the name section.
   const [open, setOpen] = useState<Section | null>(user.name ? null : 'name')
@@ -47,9 +54,12 @@ function ProfileView({ user }: { user: User }) {
           </div>
           <div className="profile-soon">
             <strong>قريبًا في ملفك إن شاء الله ✨</strong>
-            <p>تسجيل الحضور في الدروس، سلسلة الأيام المتتالية، وأسئلة يومية.</p>
+            <p>أسئلة يومية تراجع بها ما تعلمته.</p>
           </div>
         </div>
+
+        {progress && <StatsCard progress={progress} />}
+        <AchievementsLink />
 
         <div className="settings-list">
           <SettingRow icon={<UserIcon />} label="الاسم" value={user.name ?? 'لم يُضف بعد'} open={open === 'name'} onToggle={() => toggle('name')}>
@@ -66,6 +76,56 @@ function ProfileView({ user }: { user: User }) {
         <button className="secondary-button profile-logout" type="button" onClick={handleLogout}>تسجيل الخروج</button>
       </div>
     </section>
+  )
+}
+
+// The attendance streak at a glance; every number comes from the API.
+function StatsCard({ progress }: { progress: Progress }) {
+  return (
+    <section className="stats-card" aria-labelledby="stats-card-title">
+      <div className="stats-card__hero">
+        <span className="stats-card__flame" aria-hidden="true"><FlameIcon size={34} /></span>
+        <div>
+          <h2 id="stats-card-title">الشعلة الحالية</h2>
+          <p><strong>{progress.run}</strong> حضور مباشر ورا بعض</p>
+        </div>
+      </div>
+      <dl className="stats-grid">
+        <div><dt>أطول شعلة</dt><dd>{progress.best_run}</dd></div>
+        <div><dt>المضاعِف</dt><dd dir="ltr">×{progress.multiplier.toFixed(1)}</dd></div>
+        <div><dt>الدروع</dt><dd><ShieldIcon size={18} />{progress.freezes}</dd></div>
+        <div><dt>النقاط</dt><dd>{progress.points}</dd></div>
+      </dl>
+      <ul className="stats-card__hints">
+        <li>{multiplierHint(progress)}</li>
+        <li>{freezeHint(progress)}</li>
+        <li>الدرع يحمي شعلتك لو فاتك درس.</li>
+      </ul>
+    </section>
+  )
+}
+
+// The way into the badge album, with the newest medals earned so far.
+function AchievementsLink() {
+  const { data } = useBadges()
+  const latest = (data?.badges ?? [])
+    .filter((badge) => badge.earned_at !== null)
+    .sort((a, b) => (b.earned_at ?? '').localeCompare(a.earned_at ?? ''))
+    .slice(0, 3)
+
+  return (
+    <Link to="/achievements" className="achievements-link">
+      <span className="achievements-link__medals" aria-hidden="true">
+        {latest.length
+          ? latest.map((badge) => <BadgeIcon key={badge.id} icon={badge.icon} color={badge.color} tier={badge.tier} />)
+          : <BadgeIcon icon="medal" color="gold" locked />}
+      </span>
+      <span className="achievements-link__text">
+        <strong>إنجازاتي</strong>
+        <small>{data ? `${data.summary.earned} من ${data.summary.total} وسام` : 'ألبوم أوسمتك'}</small>
+      </span>
+      <span className="achievements-link__arrow" aria-hidden="true">←</span>
+    </Link>
   )
 }
 
